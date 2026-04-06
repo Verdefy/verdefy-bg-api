@@ -15,5 +15,5 @@ RUN python -c "from rembg import new_session; new_session('u2netp')"
 
 COPY app.py .
 
-EXPOSE 5000
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--timeout", "120", "--workers", "1"]
+EXPOSE 8080
+CMD gunicorn app:app --bind 0.0.0.0:${PORT:-8080} --timeout 120 --workers 1
