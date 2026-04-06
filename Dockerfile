@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download the AI model so container starts instantly
-RUN python -c "from rembg import new_session; new_session('u2netp')"
+RUN python -c "from rembg import new_session; s = new_session('u2netp'); print('Model ready')" 2>&1 || echo 'Model will download on first request'
 
 COPY app.py .
 
