@@ -80,7 +80,7 @@ def remove_bg():
 
     mode     = request.headers.get("X-Mode", "website")
     bg_hex   = request.headers.get("X-BG-Color", BG_COLOR_HEX)
-    bg_rgb   = hex_to_rgb(bg_hex)
+    bg_rgb   = hex_to_rgb(bg_hex) if bg_hex.lower() not in ("transparent", "none") else (240, 240, 240)
 
     try:
         orig = Image.open(io.BytesIO(file_bytes)).convert("RGBA")
@@ -95,6 +95,14 @@ def remove_bg():
             canvas = Image.new("RGBA", (w + pad*2, h + pad*2), (0,0,0,0))
             canvas.paste(subject_rgba, (pad, pad), mask=subject_rgba.split()[3])
             subject_rgba = canvas
+
+        # Transparent mode: return PNG with no background fill
+        if bg_hex.lower() in ("transparent", "none"):
+            out = io.BytesIO()
+            subject_rgba.save(out, "PNG")
+            out.seek(0)
+            return send_file(out, mimetype="image/png",
+                             download_name="processed_transparent.png")
 
         if mode == "instagram":
             result = place_on_bg(subject_rgba, bg_rgb, (1080, 1080))
