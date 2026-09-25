@@ -2,18 +2,20 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system deps for image processing + OpenMP for onnxruntime
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libglib2.0-0 libsm6 libxrender1 libxext6 libgomp1 libgl1 \
+    libglib2.0-0 libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download the AI model so container starts instantly
-RUN python -c "from rembg import new_session; s = new_session('u2netp'); print('Model ready')" 2>&1 || echo 'Model will download on first request'
+# Download the selected high-detail model while building. This prevents the
+# first customer upload from waiting for a large model download.
+ARG BG_MODEL=birefnet-general
+ENV BG_MODEL=${BG_MODEL}
+RUN python -c "import os; from rembg import new_session; new_session(os.environ['BG_MODEL']); print('Model ready:', os.environ['BG_MODEL'])"
 
 COPY app.py .
 
 EXPOSE 8080
-CMD gunicorn app:app --bind 0.0.0.0:${PORT:-8080} --timeout 120 --workers 1
+CMD gunicorn app:app --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 2 --timeout 180
