@@ -11,13 +11,14 @@ from rembg import new_session, remove
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = int(os.getenv("MAX_UPLOAD_MB", "20")) * 1024 * 1024
 
-DEFAULT_MODEL = os.getenv("BG_MODEL", "birefnet-general-lite")
+DEFAULT_MODEL = os.getenv("BG_MODEL", "silueta")
 API_SECRET = os.getenv("API_SECRET", "")
 ALLOWED_MODELS = {
     "birefnet-general",
     "birefnet-general-lite",
     "birefnet-hrsod",
     "isnet-general-use",
+    "silueta",
 }
 
 
