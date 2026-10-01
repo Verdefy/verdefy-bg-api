@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Download the selected high-detail model while building. This prevents the
 # first customer upload from waiting for a large model download.
-ARG BG_MODEL=birefnet-general-lite
+ARG BG_MODEL=silueta
 ENV BG_MODEL=${BG_MODEL}
 RUN python -c "import os; from rembg import new_session; new_session(os.environ['BG_MODEL']); print('Model ready:', os.environ['BG_MODEL'])"
 
